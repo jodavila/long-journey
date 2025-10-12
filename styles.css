@@ -17,12 +17,27 @@
     --border-color: #334155;
 }
 
+/* Day Theme with Pastel Yellow and Green */
+body.day-theme {
+    --primary-color: #a8d08d;
+    --secondary-color: #c9e4a0;
+    --accent-color: #f4d35e;
+    --success-color: #7cb342;
+    --warning-color: #fdd835;
+    --bg-color: #fffef2;
+    --card-bg: #f8f9e8;
+    --text-color: #2d3e1f;
+    --text-secondary: #5a6c4d;
+    --border-color: #d4e2c6;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--bg-color) 0%, #1e293b 100%);
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
     color: var(--text-color);
     min-height: 100vh;
     padding: 20px;
+    transition: background 0.5s ease, color 0.3s ease;
 }
 
 .container {
@@ -37,6 +52,30 @@ header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+    position: relative;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 header h1 {
@@ -67,12 +106,20 @@ main {
     padding: 30px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+body.day-theme .card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
+
+body.day-theme .card:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
 }
 
 .card h2 {

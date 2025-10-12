@@ -18,11 +18,37 @@ class SpiritualJourneyApp {
 
     init() {
         this.loadData();
+        this.loadTheme();
         this.updateDisplay();
         this.setupEventListeners();
         this.calculateStreak();
         this.displayCurrentDate();
         this.createNotificationContainer();
+    }
+
+    loadTheme() {
+        const savedTheme = localStorage.getItem('appTheme') || 'night';
+        if (savedTheme === 'day') {
+            document.body.classList.add('day-theme');
+            document.getElementById('themeIcon').textContent = '🌙';
+        }
+    }
+
+    toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('themeIcon');
+        
+        if (body.classList.contains('day-theme')) {
+            body.classList.remove('day-theme');
+            icon.textContent = '☀️';
+            localStorage.setItem('appTheme', 'night');
+            this.showNotification('Switched to Night theme', 'success');
+        } else {
+            body.classList.add('day-theme');
+            icon.textContent = '🌙';
+            localStorage.setItem('appTheme', 'day');
+            this.showNotification('Switched to Day theme', 'success');
+        }
     }
 
     createNotificationContainer() {
