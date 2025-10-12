@@ -14,12 +14,7 @@ class SpiritualJourneyApp {
         this.init();
     }
 
-    // Sanitize user input to prevent XSS
-    sanitizeHTML(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+
 
     init() {
         this.loadData();
@@ -253,7 +248,11 @@ class SpiritualJourneyApp {
         const todaySessions = this.data.sessions.filter(s => s.date === this.currentDate);
 
         if (todaySessions.length === 0) {
-            sessionsList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No sessions recorded today. Add your first prayer or study session!</p>';
+            const emptyMsg = document.createElement('p');
+            emptyMsg.style.color = 'var(--text-secondary)';
+            emptyMsg.style.textAlign = 'center';
+            emptyMsg.textContent = 'No sessions recorded today. Add your first prayer or study session!';
+            sessionsList.appendChild(emptyMsg);
             return;
         }
 
@@ -264,14 +263,35 @@ class SpiritualJourneyApp {
             const typeIcon = session.type === 'prayer' ? '🙏' : '📖';
             const typeName = session.type === 'prayer' ? 'Prayer' : 'Bible Study';
             
-            div.innerHTML = `
-                <div class="session-info">
-                    <div class="session-type">${typeIcon} ${typeName}</div>
-                    <div class="session-time">${session.time}</div>
-                    ${session.isMorning ? '<span class="morning-badge">⭐ Morning Bonus</span>' : ''}
-                </div>
-                <div class="session-points">+${session.points} pts</div>
-            `;
+            // Create session info section
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'session-info';
+            
+            const typeDiv = document.createElement('div');
+            typeDiv.className = 'session-type';
+            typeDiv.textContent = `${typeIcon} ${typeName}`;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'session-time';
+            timeDiv.textContent = session.time;
+            
+            infoDiv.appendChild(typeDiv);
+            infoDiv.appendChild(timeDiv);
+            
+            if (session.isMorning) {
+                const badge = document.createElement('span');
+                badge.className = 'morning-badge';
+                badge.textContent = '⭐ Morning Bonus';
+                infoDiv.appendChild(badge);
+            }
+            
+            // Create points section
+            const pointsDiv = document.createElement('div');
+            pointsDiv.className = 'session-points';
+            pointsDiv.textContent = `+${session.points} pts`;
+            
+            div.appendChild(infoDiv);
+            div.appendChild(pointsDiv);
             sessionsList.appendChild(div);
         });
     }
