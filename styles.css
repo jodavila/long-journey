@@ -399,6 +399,28 @@ footer {
     opacity: 0.8;
 }
 
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
@@ -418,5 +440,11 @@ footer {
     
     .progress-stats {
         grid-template-columns: 1fr;
+    }
+    
+    #notificationContainer {
+        top: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
     }
 }

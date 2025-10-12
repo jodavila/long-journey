@@ -14,12 +14,52 @@ class SpiritualJourneyApp {
         this.init();
     }
 
+    // Sanitize user input to prevent XSS
+    sanitizeHTML(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     init() {
         this.loadData();
         this.updateDisplay();
         this.setupEventListeners();
         this.calculateStreak();
         this.displayCurrentDate();
+        this.createNotificationContainer();
+    }
+
+    createNotificationContainer() {
+        if (!document.getElementById('notificationContainer')) {
+            const container = document.createElement('div');
+            container.id = 'notificationContainer';
+            container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000;';
+            document.body.appendChild(container);
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            background: ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--accent-color)' : 'var(--primary-color)'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        `;
+        notification.textContent = message;
+        
+        const container = document.getElementById('notificationContainer');
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
     getTodayDate() {
@@ -62,9 +102,9 @@ class SpiritualJourneyApp {
                         this.data = JSON.parse(event.target.result);
                         this.saveData();
                         this.updateDisplay();
-                        alert('Data imported successfully!');
+                        this.showNotification('Data imported successfully!', 'success');
                     } catch (error) {
-                        alert('Error importing data: ' + error.message);
+                        this.showNotification('Error importing data: ' + error.message, 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -92,7 +132,7 @@ class SpiritualJourneyApp {
         const chapters = chaptersInput.value.trim();
         
         if (!chapters) {
-            alert('Please enter the chapters you read');
+            this.showNotification('Please enter the chapters you read', 'error');
             return;
         }
 
@@ -129,10 +169,18 @@ class SpiritualJourneyApp {
         this.data.dailyActivities[this.currentDate].chapters.forEach((chapter, index) => {
             const tag = document.createElement('div');
             tag.className = 'chapter-tag';
-            tag.innerHTML = `
-                ${chapter.text} <small>(${chapter.time})</small>
-                <button onclick="app.removeChapter(${index})">×</button>
-            `;
+            
+            const textNode = document.createTextNode(chapter.text + ' ');
+            const timeSmall = document.createElement('small');
+            timeSmall.textContent = `(${chapter.time})`;
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '×';
+            deleteBtn.addEventListener('click', () => this.removeChapter(index));
+            
+            tag.appendChild(textNode);
+            tag.appendChild(timeSmall);
+            tag.appendChild(deleteBtn);
             chaptersList.appendChild(tag);
         });
     }
@@ -233,7 +281,7 @@ class SpiritualJourneyApp {
         const text = input.value.trim();
 
         if (!text) {
-            alert('Please enter a prayer request');
+            this.showNotification('Please enter a prayer request', 'error');
             return;
         }
 
@@ -257,7 +305,11 @@ class SpiritualJourneyApp {
         prayerList.innerHTML = '';
 
         if (this.data.prayerList.length === 0) {
-            prayerList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No prayer requests yet. Add your first prayer request!</p>';
+            const emptyMsg = document.createElement('p');
+            emptyMsg.style.color = 'var(--text-secondary)';
+            emptyMsg.style.textAlign = 'center';
+            emptyMsg.textContent = 'No prayer requests yet. Add your first prayer request!';
+            prayerList.appendChild(emptyMsg);
             return;
         }
 
@@ -268,19 +320,47 @@ class SpiritualJourneyApp {
             const div = document.createElement('div');
             div.className = 'prayer-item' + (prayer.answered ? ' answered' : '');
             
-            div.innerHTML = `
-                <div class="prayer-content">
-                    <div class="prayer-text">${prayer.answered ? '✅ ' : ''}${prayer.text}</div>
-                    <div class="prayer-date">Added: ${prayer.date}</div>
-                </div>
-                <div class="prayer-actions">
-                    ${!prayer.answered ? 
-                        `<button class="btn-answer" onclick="app.markAnswered(${prayer.id})">Mark Answered</button>` : 
-                        '<span style="color: var(--success-color); font-weight: bold;">Answered! 🙌</span>'
-                    }
-                    <button class="btn-delete" onclick="app.deletePrayer(${prayer.id})">Delete</button>
-                </div>
-            `;
+            // Create content section
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'prayer-content';
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'prayer-text';
+            textDiv.textContent = (prayer.answered ? '✅ ' : '') + prayer.text;
+            
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'prayer-date';
+            dateDiv.textContent = 'Added: ' + prayer.date;
+            
+            contentDiv.appendChild(textDiv);
+            contentDiv.appendChild(dateDiv);
+            
+            // Create actions section
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'prayer-actions';
+            
+            if (!prayer.answered) {
+                const answerBtn = document.createElement('button');
+                answerBtn.className = 'btn-answer';
+                answerBtn.textContent = 'Mark Answered';
+                answerBtn.addEventListener('click', () => this.markAnswered(prayer.id));
+                actionsDiv.appendChild(answerBtn);
+            } else {
+                const answeredSpan = document.createElement('span');
+                answeredSpan.style.color = 'var(--success-color)';
+                answeredSpan.style.fontWeight = 'bold';
+                answeredSpan.textContent = 'Answered! 🙌';
+                actionsDiv.appendChild(answeredSpan);
+            }
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => this.deletePrayer(prayer.id));
+            actionsDiv.appendChild(deleteBtn);
+            
+            div.appendChild(contentDiv);
+            div.appendChild(actionsDiv);
             prayerList.appendChild(div);
         });
     }
@@ -411,7 +491,7 @@ class SpiritualJourneyApp {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        alert('Data exported successfully!');
+        this.showNotification('Data exported successfully!', 'success');
     }
 
     importData() {
