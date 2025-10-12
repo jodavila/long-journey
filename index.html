@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Journey - Spiritual Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🙏 Long Journey</h1>
+            <p class="subtitle">Your Daily Spiritual Companion</p>
+            <div class="date-display" id="currentDate"></div>
+        </header>
+
+        <main>
+            <!-- Daily Activities Section -->
+            <section class="card">
+                <h2>📖 Daily Activities</h2>
+                <div class="activity-grid">
+                    <div class="activity-item">
+                        <label>
+                            <input type="checkbox" id="bibleChapters" class="activity-checkbox">
+                            <span>Bible Chapters Read</span>
+                        </label>
+                        <div class="chapter-input" id="chapterInputDiv" style="display: none;">
+                            <input type="text" id="chaptersRead" placeholder="e.g., John 3, Psalms 23">
+                            <button onclick="app.saveChapters()" class="btn-small">Save</button>
+                        </div>
+                        <div id="chaptersList"></div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <label>
+                            <input type="checkbox" id="dailyLesson" class="activity-checkbox">
+                            <span>Daily Lessons Completed</span>
+                        </label>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <label>
+                            <input type="checkbox" id="devotional" class="activity-checkbox">
+                            <span>Devotional Read</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prayer & Bible Study Times Section -->
+            <section class="card">
+                <h2>⏰ Prayer & Study Sessions</h2>
+                <div class="session-controls">
+                    <button onclick="app.addPrayerSession()" class="btn">➕ Add Prayer</button>
+                    <button onclick="app.addBibleStudySession()" class="btn">➕ Add Bible Study</button>
+                </div>
+                <div id="sessionsList" class="sessions-list"></div>
+            </section>
+
+            <!-- Prayer List Section -->
+            <section class="card">
+                <h2>🙌 Prayer List</h2>
+                <div class="prayer-input">
+                    <input type="text" id="prayerRequest" placeholder="Enter your prayer request...">
+                    <button onclick="app.addPrayerRequest()" class="btn">Add Prayer</button>
+                </div>
+                <div id="prayerList" class="prayer-list"></div>
+            </section>
+
+            <!-- Progress Section -->
+            <section class="card">
+                <h2>📊 Your Progress</h2>
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPoints">0</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="streakDays">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="prayersAnswered">0</div>
+                        <div class="stat-label">Prayers Answered</div>
+                    </div>
+                </div>
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <label>Activities Completion</label>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="activitiesProgress"></div>
+                        </div>
+                        <span id="activitiesPercent">0%</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <button onclick="app.exportData()" class="btn-secondary">💾 Export Data</button>
+            <button onclick="app.importData()" class="btn-secondary">📂 Import Data</button>
+        </footer>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none;" accept=".json">
+
+    <script src="app.js"></script>
+</body>
+</html>
