@@ -1,0 +1,2 @@
+# This file ensures the DataOutput folder is tracked in git
+# Data files are saved here: data.json
