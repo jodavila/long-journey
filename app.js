@@ -506,6 +506,14 @@ class SpiritualJourneyApp {
         this.updateProgress();
     }
 
+    hasValidData(data) {
+        return data && (
+            Object.keys(data.dailyActivities || {}).length > 0 || 
+            data.sessions?.length > 0 || 
+            data.prayerList?.length > 0
+        );
+    }
+
     saveData() {
         try {
             // Save to server (DataOutput folder)
@@ -515,7 +523,14 @@ class SpiritualJourneyApp {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(this.data)
-            }).catch(error => {
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
                 console.error('Error saving data to server:', error);
                 // Fallback to localStorage if server is not available
                 localStorage.setItem('spiritualJourneyData', JSON.stringify(this.data));
@@ -531,15 +546,14 @@ class SpiritualJourneyApp {
         try {
             // Load from server (DataOutput folder)
             const response = await fetch('/api/data');
-            if (response.ok) {
-                const serverData = await response.json();
-                // If server has data, use it
-                if (serverData && (Object.keys(serverData.dailyActivities || {}).length > 0 || 
-                    serverData.sessions?.length > 0 || 
-                    serverData.prayerList?.length > 0)) {
-                    this.data = serverData;
-                    return;
-                }
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            const serverData = await response.json();
+            // If server has data, use it
+            if (this.hasValidData(serverData)) {
+                this.data = serverData;
+                return;
             }
         } catch (error) {
             console.error('Error loading data from server:', error);

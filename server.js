@@ -44,6 +44,17 @@ app.get('/api/data', (req, res) => {
 app.post('/api/data', (req, res) => {
     try {
         const data = req.body;
+        
+        // Validate request body structure
+        if (!data || typeof data !== 'object') {
+            return res.status(400).json({ error: 'Invalid data format' });
+        }
+        
+        // Validate required fields
+        if (!data.dailyActivities || !data.sessions || !data.prayerList || !data.stats) {
+            return res.status(400).json({ error: 'Missing required data fields' });
+        }
+        
         fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
         res.json({ success: true, message: 'Data saved successfully' });
     } catch (error) {
