@@ -1,14 +1,34 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.join(__dirname, 'DataOutput', 'data.json');
 
+// Rate limiting middleware
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+
 // Middleware
 app.use(express.json());
-app.use(express.static(__dirname));
+
+// Serve only specific static files (not the entire directory)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/styles.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'styles.css'));
+});
+
+app.get('/app.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'app.js'));
+});
 
 // Ensure DataOutput directory exists
 if (!fs.existsSync(path.join(__dirname, 'DataOutput'))) {
@@ -16,7 +36,7 @@ if (!fs.existsSync(path.join(__dirname, 'DataOutput'))) {
 }
 
 // API endpoint to load data
-app.get('/api/data', (req, res) => {
+app.get('/api/data', apiLimiter, (req, res) => {
     try {
         if (fs.existsSync(DATA_FILE)) {
             const data = fs.readFileSync(DATA_FILE, 'utf8');
@@ -41,7 +61,7 @@ app.get('/api/data', (req, res) => {
 });
 
 // API endpoint to save data
-app.post('/api/data', (req, res) => {
+app.post('/api/data', apiLimiter, (req, res) => {
     try {
         const data = req.body;
         
