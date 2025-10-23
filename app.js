@@ -16,8 +16,8 @@ class SpiritualJourneyApp {
 
 
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.loadTheme();
         this.updateDisplay();
         this.setupEventListeners();
@@ -508,21 +508,51 @@ class SpiritualJourneyApp {
 
     saveData() {
         try {
-            localStorage.setItem('spiritualJourneyData', JSON.stringify(this.data));
+            // Save to server (DataOutput folder)
+            fetch('/api/data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.data)
+            }).catch(error => {
+                console.error('Error saving data to server:', error);
+                // Fallback to localStorage if server is not available
+                localStorage.setItem('spiritualJourneyData', JSON.stringify(this.data));
+            });
+            
             this.calculateStreak();
         } catch (error) {
             console.error('Error saving data:', error);
         }
     }
 
-    loadData() {
+    async loadData() {
+        try {
+            // Load from server (DataOutput folder)
+            const response = await fetch('/api/data');
+            if (response.ok) {
+                const serverData = await response.json();
+                // If server has data, use it
+                if (serverData && (Object.keys(serverData.dailyActivities || {}).length > 0 || 
+                    serverData.sessions?.length > 0 || 
+                    serverData.prayerList?.length > 0)) {
+                    this.data = serverData;
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading data from server:', error);
+        }
+        
+        // Fallback to localStorage if server is not available
         try {
             const saved = localStorage.getItem('spiritualJourneyData');
             if (saved) {
                 this.data = JSON.parse(saved);
             }
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Error loading data from localStorage:', error);
         }
     }
 

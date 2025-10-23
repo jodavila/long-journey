@@ -36,28 +36,37 @@ A beautiful and interactive web application to track your daily spiritual journe
 - **Activities Completion Progress Bar**: Visual representation of daily activity completion
 
 ### 💾 Data Management
-- **Auto-Save**: All data is automatically saved to browser's localStorage
+- **Auto-Save to File**: All data is automatically saved to `DataOutput/data.json` in the project folder
+- **Auto-Load on Startup**: Data is automatically loaded from `DataOutput/data.json` when the application starts
 - **Export to JSON**: Download your complete spiritual journey data as a JSON file
 - **Import from JSON**: Restore your data from a previously exported file
-- **Persistent Storage**: Your data stays safe even after closing the browser
+- **Fallback Storage**: If the server is not running, data falls back to browser's localStorage
 
 ## 🚀 Getting Started
 
-### Option 1: Open Directly
-Simply open the `index.html` file in any modern web browser. No server required!
+### Installation
 
-### Option 2: Local Server
-For the best experience, serve the files using a local web server:
-
+1. Clone the repository
+2. Install dependencies:
 ```bash
-# Using Python 3
-python3 -m http.server 8080
-
-# Using Node.js (if you have http-server installed)
-npx http-server -p 8080
-
-# Then open http://localhost:8080 in your browser
+npm install
 ```
+
+### Running the Application
+
+Start the server:
+```bash
+npm start
+```
+
+Then open http://localhost:8080 in your browser.
+
+The application will automatically:
+- Load existing data from the `DataOutput/data.json` file on startup
+- Save all changes to the `DataOutput/data.json` file automatically
+
+### Alternative: Open Directly (Legacy Mode)
+You can still open the `index.html` file directly in a browser, but data will be stored in localStorage instead of the DataOutput folder.
 
 ## 📱 Usage
 
@@ -96,7 +105,7 @@ npx http-server -p 8080
 
 ## 🔒 Privacy
 
-All your data is stored locally in your browser's localStorage. Nothing is sent to any server - your spiritual journey remains completely private and personal.
+All your data is stored locally in the `DataOutput/data.json` file within the project folder. When running the Node.js server, nothing is sent to any external server - your spiritual journey remains completely private and personal. If you open the HTML file directly, data is stored in your browser's localStorage.
 
 ## 🌟 Tips
 
