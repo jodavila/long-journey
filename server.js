@@ -14,19 +14,25 @@ const apiLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
 });
 
+const staticLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // Higher limit for static files
+    message: 'Too many requests from this IP, please try again later.'
+});
+
 // Middleware
 app.use(express.json());
 
 // Serve only specific static files (not the entire directory)
-app.get('/', (req, res) => {
+app.get('/', staticLimiter, (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/styles.css', (req, res) => {
+app.get('/styles.css', staticLimiter, (req, res) => {
     res.sendFile(path.join(__dirname, 'styles.css'));
 });
 
-app.get('/app.js', (req, res) => {
+app.get('/app.js', staticLimiter, (req, res) => {
     res.sendFile(path.join(__dirname, 'app.js'));
 });
 
